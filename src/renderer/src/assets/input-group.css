@@ -1,0 +1,71 @@
+/* 公共输入组样式 — PingPanel / PortScanPanel / TraceroutePanel / LanScanPanel / SubnetCalcPanel */
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.prefix {
+  padding: 10px 15px;
+  background: #252525;
+  color: #00ffcc;
+  font-weight: bold;
+  font-size: 14px;
+  white-space: nowrap;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  color: #fff;
+  border: none;
+  outline: none;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.input-group button {
+  padding: 0 20px;
+  height: 40px;
+  background: #007acc;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.input-group button:hover {
+  background: #0098ff;
+}
+
+.input-group button:disabled {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.input-group button.stop-btn {
+  background: #ff5f56;
+}
+
+.input-group button.stop-btn:hover {
+  background: #ff7b73;
+}
