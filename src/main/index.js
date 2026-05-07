@@ -100,7 +100,11 @@ app.whenReady().then(() => {
   // 中止 ping
   ipcMain.handle('abort-ping', () => {
     if (runningPing) {
-      runningPing.kill()
+      if (process.platform === 'win32') {
+        exec(`taskkill /F /T /PID ${runningPing.pid}`)
+      } else {
+        runningPing.kill('SIGTERM')
+      }
       runningPing = null
       return { success: true }
     }
@@ -266,7 +270,11 @@ app.whenReady().then(() => {
   // 中止路由追踪
   ipcMain.handle('abort-traceroute', () => {
     if (runningTraceroute) {
-      runningTraceroute.kill()
+      if (process.platform === 'win32') {
+        exec(`taskkill /F /T /PID ${runningTraceroute.pid}`)
+      } else {
+        runningTraceroute.kill('SIGTERM')
+      }
       runningTraceroute = null
       return { success: true }
     }

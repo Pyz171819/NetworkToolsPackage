@@ -11,22 +11,18 @@
 </template>
 
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref } from 'vue'
 import TerminalView from './TerminalView.vue'
 
 const target = ref('www.baidu.com')
 const output = ref('')
 const running = ref(false)
 
-onActivated(() => {
-  output.value = ''
-})
-
 const run = async () => {
   if (!target.value || running.value) return
 
   running.value = true
-  output.value = `[System] 正在向 ${target.value} 发送 ICMP 探测包...\n\n`
+  output.value += `\n━━━ [${new Date().toLocaleTimeString()}] Ping ${target.value} ━━━\n`
 
   window.api.onPingData((data) => {
     output.value += data
