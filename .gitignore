@@ -1,0 +1,29 @@
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# AI / Local tools
+.claude/
+.kiro/
+
+# Node
+node_modules/
+dist/
+
+# Maven / Java
+target/
+*.class
+
+# Logs
+logs/
+*.log
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+application-prod.yml
+application-dev.yml
