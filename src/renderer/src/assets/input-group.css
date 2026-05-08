@@ -10,28 +10,33 @@
 .input-group {
   display: flex;
   align-items: center;
-  background: #1e1e1e;
-  border: 1px solid #333;
-  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(16, 22, 30, 0.98) 0%, rgba(12, 17, 24, 0.98) 100%);
+  border: 1px solid rgba(74, 97, 122, 0.42);
+  border-radius: 14px;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 22px rgba(0, 0, 0, 0.14);
 }
 
 .prefix {
-  padding: 10px 15px;
-  background: #252525;
-  color: #00ffcc;
+  padding: 11px 14px;
+  background: linear-gradient(180deg, rgba(24, 32, 42, 0.98) 0%, rgba(19, 27, 36, 0.98) 100%);
+  color: #70dfd4;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   white-space: nowrap;
   font-family: 'Consolas', 'Courier New', monospace;
+  border-right: 1px solid #243240;
 }
 
 .input-group input {
   flex: 1;
-  padding: 10px;
+  height: 46px;
+  padding: 0 14px;
   background: transparent;
-  color: #fff;
+  color: #eef4fb;
   border: none;
   outline: none;
   font-family: 'Consolas', 'Courier New', monospace;
@@ -39,33 +44,39 @@
   min-width: 0;
 }
 
+.input-group input::placeholder {
+  color: #74879d;
+}
+
 .input-group button {
-  padding: 0 20px;
-  height: 40px;
-  background: #007acc;
+  padding: 0 18px;
+  height: 46px;
+  background: linear-gradient(180deg, #1a88dc 0%, #0d69b9 100%);
   color: white;
   border: none;
   cursor: pointer;
   font-weight: bold;
-  transition: all 0.3s;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  font-size: 13px;
   white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .input-group button:hover {
-  background: #0098ff;
+  filter: brightness(1.06);
 }
 
 .input-group button:disabled {
-  background: #444;
-  color: #888;
+  background: #2a3542;
+  color: #738296;
   cursor: not-allowed;
+  filter: none;
 }
 
 .input-group button.stop-btn {
-  background: #ff5f56;
+  background: linear-gradient(180deg, #e76161 0%, #c74b4b 100%);
 }
 
 .input-group button.stop-btn:hover {
-  background: #ff7b73;
+  filter: brightness(1.08);
 }

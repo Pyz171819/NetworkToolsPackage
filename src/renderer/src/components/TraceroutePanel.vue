@@ -11,16 +11,13 @@
 </template>
 
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import TerminalView from './TerminalView.vue'
 
 const target = ref('www.baidu.com')
 const output = ref('')
 const running = ref(false)
-
-onActivated(() => {
-  output.value = ''
-})
+let offTracerouteData = null
 
 const run = async () => {
   if (!target.value || running.value) return
@@ -31,9 +28,11 @@ const run = async () => {
   }
 
   running.value = true
-  output.value = `[System] 正在追踪到 ${target.value} 的路由...\n\n`
+  output.value += `\n━━━ [${new Date().toLocaleTimeString()}] Traceroute ${target.value} ━━━\n`
+  output.value += `[System] 正在追踪到 ${target.value} 的路由...\n\n`
 
-  window.api.onTracerouteData((data) => {
+  offTracerouteData?.()
+  offTracerouteData = window.api.onTracerouteData((data) => {
     output.value += data
   })
 
@@ -43,13 +42,18 @@ const run = async () => {
     output.value += `\n[Error] 执行出错: ${error}`
   } finally {
     running.value = false
-    window.api?.offTracerouteData()
+    offTracerouteData?.()
+    offTracerouteData = null
   }
 }
 
 const abort = () => {
   window.api?.abortTraceroute()
 }
+
+onUnmounted(() => {
+  offTracerouteData?.()
+})
 </script>
 
 <style scoped>

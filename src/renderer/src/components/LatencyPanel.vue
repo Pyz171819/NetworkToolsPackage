@@ -3,7 +3,11 @@
     <div class="panel-header" @dblclick="collapsed = !collapsed">
       <span class="icon">📡</span>
       <span>延时监控</span>
-      <button class="collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? '展开' : '收起'">
+      <button
+        class="collapse-btn"
+        :title="collapsed ? '展开' : '收起'"
+        @click="collapsed = !collapsed"
+      >
         {{ collapsed ? '◀' : '▶' }}
       </button>
       <button v-if="!collapsed" class="refresh-btn" :disabled="isPingingAll" @click.stop="pingAll">
@@ -34,7 +38,8 @@
             v-else-if="target.latency !== null"
             class="latency-value"
             :class="latencyClass(target.latency)"
-          >{{ target.latency }}ms</span>
+            >{{ target.latency }}ms</span
+          >
           <span v-else class="status">-</span>
         </div>
       </div>
@@ -158,10 +163,7 @@ onMounted(() => {
 
 <style scoped>
 .panel {
-  width: 220px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 6px;
+  width: 300px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -169,19 +171,17 @@ onMounted(() => {
 }
 
 .panel.collapsed {
-  width: 42px;
+  width: 54px;
 }
 
 .panel-header {
-  padding: 10px 12px;
-  background: #252525;
-  border-bottom: 1px solid #333;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #00ffcc;
+  gap: 8px;
+  color: #8ff7df;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 14px;
   flex-shrink: 0;
   cursor: pointer;
   user-select: none;
@@ -196,7 +196,7 @@ onMounted(() => {
 }
 
 .icon {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .collapse-btn {
@@ -221,18 +221,19 @@ onMounted(() => {
 .refresh-btn {
   margin-left: auto;
   background: transparent;
-  border: 1px solid #00ffcc;
-  color: #00ffcc;
-  padding: 3px 10px;
-  border-radius: 3px;
+  border: 1px solid rgba(0, 255, 204, 0.72);
+  color: #7cefd4;
+  width: 40px;
+  height: 36px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
 }
 
 .refresh-btn:hover {
-  background: #00ffcc;
-  color: #000;
+  background: rgba(0, 255, 204, 0.12);
+  color: #dffcf3;
 }
 
 .refresh-btn:disabled {
@@ -252,35 +253,39 @@ onMounted(() => {
 }
 
 .ping-list {
-  padding: 12px;
+  padding: 14px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ping-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background: #0d0d0d;
-  border: 1px solid #333;
-  border-radius: 4px;
-  transition: all 0.3s;
+  padding: 12px 13px;
+  background: linear-gradient(180deg, rgba(9, 13, 17, 0.94) 0%, rgba(13, 18, 23, 0.94) 100%);
+  border: 1px solid rgba(50, 73, 85, 0.4);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .ping-item.pinging {
-  border-color: #ffbd2e;
+  border-color: rgba(255, 189, 46, 0.72);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
 .ping-item.success {
-  border-color: #27c93f;
+  border-color: rgba(39, 201, 63, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.02),
+    0 0 0 1px rgba(39, 201, 63, 0.08);
 }
 
 .ping-item.failed {
-  border-color: #ff5f56;
+  border-color: rgba(255, 95, 86, 0.7);
 }
 
 @keyframes pulse {
@@ -296,7 +301,8 @@ onMounted(() => {
 .ping-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  min-width: 0;
 }
 
 .target-name-row {
@@ -306,20 +312,23 @@ onMounted(() => {
 }
 
 .target-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
 
 .target-name {
-  color: #00ffcc;
+  color: #dff6ff;
   font-weight: bold;
   font-size: 13px;
 }
 
 .target-host {
-  color: #666;
-  font-size: 10px;
+  color: #75879a;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ping-latency {
@@ -327,8 +336,11 @@ onMounted(() => {
 }
 
 .latency-value {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
+  display: inline-flex;
+  min-width: 62px;
+  justify-content: flex-end;
 }
 
 .latency-good {

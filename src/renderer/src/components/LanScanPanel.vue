@@ -12,16 +12,14 @@
 </template>
 
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import TerminalView from './TerminalView.vue'
 
 const output = ref('')
 const running = ref(false)
 const progress = ref(0)
-
-onActivated(() => {
-  output.value = ''
-})
+let offLanScanData = null
+let offLanScanProgress = null
 
 const run = async () => {
   if (running.value) return
@@ -33,13 +31,17 @@ const run = async () => {
 
   running.value = true
   progress.value = 0
-  output.value = `[System] 正在扫描局域网...\n\n`
+  output.value += `\n━━━ [${new Date().toLocaleTimeString()}] 局域网扫描 ━━━\n`
+  output.value += `[System] 正在扫描局域网...\n\n`
 
-  window.api.onLanScanData((data) => {
+  offLanScanData?.()
+  offLanScanProgress?.()
+
+  offLanScanData = window.api.onLanScanData((data) => {
     output.value += data
   })
 
-  window.api.onLanScanProgress((data) => {
+  offLanScanProgress = window.api.onLanScanProgress((data) => {
     progress.value = data.progress
   })
 
@@ -50,9 +52,17 @@ const run = async () => {
   } finally {
     running.value = false
     progress.value = 0
-    window.api?.offLanScanData()
+    offLanScanData?.()
+    offLanScanProgress?.()
+    offLanScanData = null
+    offLanScanProgress = null
   }
 }
+
+onUnmounted(() => {
+  offLanScanData?.()
+  offLanScanProgress?.()
+})
 </script>
 
 <style scoped>

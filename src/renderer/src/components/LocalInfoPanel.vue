@@ -3,7 +3,11 @@
     <div class="panel-header" @dblclick="collapsed = !collapsed">
       <span class="icon">🖥️</span>
       <span>本机信息</span>
-      <button class="collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? '展开' : '收起'">
+      <button
+        class="collapse-btn"
+        :title="collapsed ? '展开' : '收起'"
+        @click="collapsed = !collapsed"
+      >
         {{ collapsed ? '◀' : '▶' }}
       </button>
       <button v-if="!collapsed" class="refresh-btn" :disabled="loading" @click.stop="fetchInfo">
@@ -50,30 +54,27 @@ onMounted(() => {
 
 <style scoped>
 .panel {
-  width: 220px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 6px;
+  width: 320px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: width 0.3s ease;
+  transition:
+    width 0.3s ease,
+    box-shadow 0.2s ease;
 }
 
 .panel.collapsed {
-  width: 42px;
+  width: 54px;
 }
 
 .panel-header {
-  padding: 10px 12px;
-  background: #252525;
-  border-bottom: 1px solid #333;
+  padding: 12px 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #00ffcc;
+  gap: 8px;
+  color: #8ff7df;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 14px;
   flex-shrink: 0;
   cursor: pointer;
   user-select: none;
@@ -88,7 +89,7 @@ onMounted(() => {
 }
 
 .icon {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .collapse-btn {
@@ -113,18 +114,19 @@ onMounted(() => {
 .refresh-btn {
   margin-left: auto;
   background: transparent;
-  border: 1px solid #00ffcc;
-  color: #00ffcc;
-  padding: 3px 10px;
-  border-radius: 3px;
+  border: 1px solid rgba(0, 255, 204, 0.72);
+  color: #7cefd4;
+  width: 40px;
+  height: 36px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
 }
 
 .refresh-btn:hover {
-  background: #00ffcc;
-  color: #000;
+  background: rgba(0, 255, 204, 0.12);
+  color: #dffcf3;
 }
 
 .refresh-btn:disabled {
@@ -144,35 +146,38 @@ onMounted(() => {
 }
 
 .info-content {
-  padding: 12px;
+  padding: 14px;
   overflow-y: auto;
 }
 
 .info-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  padding: 8px;
-  background: #0d0d0d;
-  border-radius: 4px;
-  border-left: 2px solid #00ffcc;
+  gap: 5px;
+  padding: 12px 13px;
+  background: linear-gradient(180deg, rgba(10, 14, 18, 0.92) 0%, rgba(13, 17, 22, 0.92) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(43, 78, 92, 0.34);
+  border-left: 3px solid #00ffcc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .info-label {
-  color: #888;
-  font-size: 10px;
+  color: #8ea1b4;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
 .info-value {
-  color: #fff;
-  font-size: 12px;
+  color: #f3f8fd;
+  font-size: 13px;
+  font-weight: 700;
   word-break: break-all;
 }
 

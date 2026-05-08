@@ -89,13 +89,9 @@
       </div>
     </div>
 
-    <div v-else-if="input" class="error-msg">
-      格式错误，请输入如 192.168.1.0/24 的格式
-    </div>
+    <div v-else-if="input" class="error-msg">格式错误，请输入如 192.168.1.0/24 的格式</div>
 
-    <div v-else class="placeholder">
-      输入 IP 地址和 CIDR 前缀进行子网计算
-    </div>
+    <div v-else class="placeholder">输入 IP 地址和 CIDR 前缀进行子网计算</div>
   </div>
 </template>
 
@@ -126,19 +122,17 @@ function ipToInt(ip) {
 }
 
 function intToIp(int) {
-  return [
-    (int >>> 24) & 0xff,
-    (int >>> 16) & 0xff,
-    (int >>> 8) & 0xff,
-    int & 0xff
-  ].join('.')
+  return [(int >>> 24) & 0xff, (int >>> 16) & 0xff, (int >>> 8) & 0xff, int & 0xff].join('.')
 }
 
 function intToBinary(int) {
   return (
-    ((int >>> 24) & 0xff).toString(2).padStart(8, '0') + '.' +
-    ((int >>> 16) & 0xff).toString(2).padStart(8, '0') + '.' +
-    ((int >>> 8) & 0xff).toString(2).padStart(8, '0') + '.' +
+    ((int >>> 24) & 0xff).toString(2).padStart(8, '0') +
+    '.' +
+    ((int >>> 16) & 0xff).toString(2).padStart(8, '0') +
+    '.' +
+    ((int >>> 8) & 0xff).toString(2).padStart(8, '0') +
+    '.' +
     (int & 0xff).toString(2).padStart(8, '0')
   )
 }

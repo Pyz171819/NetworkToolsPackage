@@ -11,12 +11,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import TerminalView from './TerminalView.vue'
 
 const target = ref('www.baidu.com')
 const output = ref('')
 const running = ref(false)
+let offPingData = null
 
 const run = async () => {
   if (!target.value || running.value) return
@@ -24,7 +25,8 @@ const run = async () => {
   running.value = true
   output.value += `\n━━━ [${new Date().toLocaleTimeString()}] Ping ${target.value} ━━━\n`
 
-  window.api.onPingData((data) => {
+  offPingData?.()
+  offPingData = window.api.onPingData((data) => {
     output.value += data
   })
 
@@ -34,13 +36,18 @@ const run = async () => {
     output.value += `\n[Error] 执行出错: ${error}`
   } finally {
     running.value = false
-    window.api?.offPingData()
+    offPingData?.()
+    offPingData = null
   }
 }
 
 const abort = () => {
   window.api?.abortPing()
 }
+
+onUnmounted(() => {
+  offPingData?.()
+})
 </script>
 
 <style scoped>

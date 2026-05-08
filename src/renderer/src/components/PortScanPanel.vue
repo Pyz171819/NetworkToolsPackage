@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { ref, onActivated } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import TerminalView from './TerminalView.vue'
 
 const host = ref('www.baidu.com')
@@ -22,24 +22,26 @@ const ports = ref('80,443,3306,8080')
 const output = ref('')
 const running = ref(false)
 const progress = ref(0)
-
-onActivated(() => {
-  output.value = ''
-})
+let offScanData = null
+let offScanProgress = null
 
 const run = async () => {
   if (!host.value || !ports.value || running.value) return
 
   running.value = true
   progress.value = 0
-  output.value = `[System] 准备扫描 ${host.value}...\n`
+  output.value += `\n━━━ [${new Date().toLocaleTimeString()}] 扫描 ${host.value} / ${ports.value} ━━━\n`
+  output.value += `[System] 准备扫描 ${host.value}...\n`
 
   if (window.api) {
-    window.api.onScanData((data) => {
+    offScanData?.()
+    offScanProgress?.()
+
+    offScanData = window.api.onScanData((data) => {
       output.value += data
     })
 
-    window.api.onScanProgress((data) => {
+    offScanProgress = window.api.onScanProgress((data) => {
       progress.value = data.progress
     })
   }
@@ -51,9 +53,17 @@ const run = async () => {
   } finally {
     running.value = false
     progress.value = 0
-    window.api?.offScanData()
+    offScanData?.()
+    offScanProgress?.()
+    offScanData = null
+    offScanProgress = null
   }
 }
+
+onUnmounted(() => {
+  offScanData?.()
+  offScanProgress?.()
+})
 </script>
 
 <style scoped>

@@ -12,10 +12,13 @@
           v-for="(script, index) in scripts"
           :key="script.id"
           draggable="true"
-          :class="['script-item', {
-            active: activeScript?.id === script.id,
-            'drag-over': dragOverIndex === index && dragIndex !== index
-          }]"
+          :class="[
+            'script-item',
+            {
+              active: activeScript?.id === script.id,
+              'drag-over': dragOverIndex === index && dragIndex !== index
+            }
+          ]"
           @click="switchScript(script)"
           @dragstart="onDragStart(index, $event)"
           @dragover.prevent="onDragOver(index)"
@@ -26,7 +29,7 @@
           <div class="script-info">
             <div class="script-name">{{ script.name }}</div>
             <div class="script-path" :title="script.path">{{ script.path }}</div>
-            <div class="script-tags" v-if="script.tags">
+            <div v-if="script.tags" class="script-tags">
               <span v-for="tag in script.tags" :key="tag" class="tag">{{ tag }}</span>
             </div>
           </div>
@@ -34,20 +37,20 @@
             <button
               class="run-btn"
               :disabled="running"
-              @click.stop="runScript(script)"
               title="运行"
-            >▶</button>
+              @click.stop="runScript(script)"
+            >
+              ▶
+            </button>
             <button
-              class="stop-btn"
               v-if="running && runningScriptId === script.id"
-              @click.stop="stopScript"
+              class="stop-btn"
               title="停止"
-            >■</button>
-            <button
-              class="del-btn"
-              @click.stop="removeScript(script)"
-              title="删除"
-            >✕</button>
+              @click.stop="stopScript"
+            >
+              ■
+            </button>
+            <button class="del-btn" title="删除" @click.stop="removeScript(script)">✕</button>
           </div>
         </div>
 
@@ -61,7 +64,7 @@
     <div class="script-output">
       <div class="output-wrapper">
         <TerminalView title="Terminal - 脚本输出" :output="output" @clear="output = ''" />
-        <div class="input-bar" v-if="running">
+        <div v-if="running" class="input-bar">
           <span class="input-prefix">stdin &gt;</span>
           <input
             v-model="stdinInput"
@@ -86,6 +89,8 @@ const output = ref('')
 const running = ref(false)
 const runningScriptId = ref(null)
 const stdinInput = ref('')
+let offScriptOutput = null
+let offScriptExit = null
 
 // 拖拽排序
 const dragIndex = ref(null)
@@ -174,12 +179,10 @@ const removeScript = async (script) => {
   if (activeScript.value?.id === script.id) {
     const next = scripts.value[0] || null
     activeScript.value = next
-    output.value = next ? (scriptOutputs[next.id] || '') : ''
+    output.value = next ? scriptOutputs[next.id] || '' : ''
   }
   await saveScriptList()
 }
-
-
 
 // 运行脚本
 const runScript = async (script) => {
@@ -187,20 +190,23 @@ const runScript = async (script) => {
   running.value = true
   runningScriptId.value = script.id
   switchScript(script)
-  output.value = ''
+  output.value += `\n━━━ [${new Date().toLocaleTimeString()}] 运行 ${script.name} ━━━\n`
 
-  // 清除旧的监听，注册新的
-  window.api?.offScriptEvents()
+  offScriptOutput?.()
+  offScriptExit?.()
 
-  window.api.onScriptOutput((data) => {
+  offScriptOutput = window.api.onScriptOutput((data) => {
     output.value += data
     scriptOutputs[script.id] = output.value
   })
 
-  window.api.onScriptExit(() => {
+  offScriptExit = window.api.onScriptExit(() => {
     running.value = false
     runningScriptId.value = null
-    window.api?.offScriptEvents()
+    offScriptOutput?.()
+    offScriptExit?.()
+    offScriptOutput = null
+    offScriptExit = null
   })
 
   try {
@@ -209,13 +215,19 @@ const runScript = async (script) => {
       output.value += '[Error] 脚本启动失败，请检查文件路径和脚本解释器\n'
       running.value = false
       runningScriptId.value = null
-      window.api?.offScriptEvents()
+      offScriptOutput?.()
+      offScriptExit?.()
+      offScriptOutput = null
+      offScriptExit = null
     }
   } catch (err) {
     output.value += `[Error] IPC 调用失败: ${err.message}\n`
     running.value = false
     runningScriptId.value = null
-    window.api?.offScriptEvents()
+    offScriptOutput?.()
+    offScriptExit?.()
+    offScriptOutput = null
+    offScriptExit = null
   }
 }
 
@@ -237,7 +249,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.api?.offScriptEvents()
+  offScriptOutput?.()
+  offScriptExit?.()
 })
 </script>
 
@@ -251,19 +264,20 @@ onUnmounted(() => {
 
 .script-list {
   width: 280px;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 6px;
+  background: linear-gradient(180deg, #141b23 0%, #10161d 100%);
+  border: 1px solid #253240;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
 .list-header {
-  padding: 10px 12px;
-  background: #252525;
-  border-bottom: 1px solid #333;
+  padding: 12px;
+  background: rgba(18, 25, 34, 0.96);
+  border-bottom: 1px solid #24303d;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -271,17 +285,17 @@ onUnmounted(() => {
 }
 
 .list-title {
-  color: #00ffcc;
+  color: #edf3fa;
   font-weight: bold;
   font-size: 13px;
 }
 
 .add-btn {
-  background: #007acc;
+  background: linear-gradient(180deg, #1382d4 0%, #0c67b6 100%);
   color: #fff;
   border: none;
-  padding: 4px 12px;
-  border-radius: 3px;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
@@ -289,13 +303,13 @@ onUnmounted(() => {
 }
 
 .add-btn:hover {
-  background: #0098ff;
+  filter: brightness(1.08);
 }
 
 .scripts {
   flex: 1;
   overflow-y: auto;
-  padding: 6px 0;
+  padding: 8px;
 }
 
 .script-item {
@@ -304,21 +318,26 @@ onUnmounted(() => {
   padding: 10px 12px;
   gap: 8px;
   cursor: pointer;
-  transition: background 0.2s;
-  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 .script-item:hover {
-  background: #222;
+  background: rgba(31, 41, 53, 0.92);
+  border-color: #2a3948;
 }
 
 .script-item.active {
-  background: #1a2a3a;
-  border-left-color: #00ffcc;
+  background: rgba(14, 50, 76, 0.7);
+  border-color: #299de7;
+  box-shadow: inset 0 0 0 1px rgba(41, 157, 231, 0.18);
 }
 
 .script-item.drag-over {
-  border-top: 2px solid #00ffcc;
+  border-color: #63d4c8;
+  transform: translateY(-1px);
 }
 
 .script-item[draggable='true'] {
@@ -336,7 +355,7 @@ onUnmounted(() => {
 }
 
 .script-name {
-  color: #e0e0e0;
+  color: #edf3fa;
   font-size: 13px;
   font-weight: bold;
   white-space: nowrap;
@@ -345,7 +364,7 @@ onUnmounted(() => {
 }
 
 .script-path {
-  color: #666;
+  color: #728095;
   font-size: 10px;
   white-space: nowrap;
   overflow: hidden;
@@ -361,55 +380,56 @@ onUnmounted(() => {
 }
 
 .tag {
-  background: #2a2a3a;
-  color: #888;
+  background: rgba(37, 49, 63, 0.95);
+  color: #8e9bad;
   font-size: 10px;
   padding: 1px 6px;
-  border-radius: 3px;
-  border: 1px solid #333;
+  border-radius: 999px;
+  border: 1px solid #2c3a48;
 }
 
 .script-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
+  opacity: 0.92;
 }
 
 .script-actions button {
   width: 24px;
   height: 24px;
   border: none;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .run-btn {
-  background: #27c93f;
+  background: linear-gradient(180deg, #2bc767 0%, #24a957 100%);
   color: #fff;
 }
 
 .run-btn:hover:not(:disabled) {
-  background: #30d94a;
+  filter: brightness(1.08);
 }
 
 .run-btn:disabled {
-  background: #333;
-  color: #666;
+  background: #283340;
+  color: #708093;
   cursor: not-allowed;
 }
 
 .stop-btn {
-  background: #ff5f56;
+  background: linear-gradient(180deg, #e76161 0%, #c74b4b 100%);
   color: #fff;
 }
 
 .stop-btn:hover {
-  background: #ff7b73;
+  filter: brightness(1.08);
 }
 
 .tag-btn {
@@ -424,19 +444,21 @@ onUnmounted(() => {
 
 .del-btn {
   background: transparent;
-  color: #666;
+  color: #718093;
+  border: 1px solid transparent;
 }
 
 .del-btn:hover {
-  background: #ff5f56;
-  color: #fff;
+  background: rgba(231, 97, 97, 0.12);
+  border-color: rgba(231, 97, 97, 0.28);
+  color: #ffd7d7;
 }
 
 .empty-hint {
   text-align: center;
-  color: #555;
+  color: #738094;
   font-size: 12px;
-  padding: 30px 16px;
+  padding: 36px 18px;
   line-height: 1.6;
 }
 
@@ -456,39 +478,44 @@ onUnmounted(() => {
 .input-bar {
   display: flex;
   align-items: center;
-  background: #1e1e1e;
-  border: 1px solid #333;
+  background: rgba(16, 22, 30, 0.98);
+  border: 1px solid #243240;
   border-top: none;
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 10px 10px;
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .input-prefix {
   padding: 8px 12px;
-  background: #252525;
-  color: #ffbd2e;
+  background: rgba(24, 32, 42, 0.95);
+  color: #f2c56d;
   font-weight: bold;
   font-size: 12px;
   white-space: nowrap;
   font-family: 'Consolas', 'Courier New', monospace;
+  border-right: 1px solid #243240;
 }
 
 .input-bar input {
   flex: 1;
-  padding: 8px 10px;
+  padding: 9px 12px;
   background: transparent;
-  color: #fff;
+  color: #eef4fb;
   border: none;
   outline: none;
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 13px;
 }
 
+.input-bar input::placeholder {
+  color: #667588;
+}
+
 .input-bar button {
   padding: 0 16px;
   height: 34px;
-  background: #007acc;
+  background: linear-gradient(180deg, #1382d4 0%, #0c67b6 100%);
   color: white;
   border: none;
   cursor: pointer;
@@ -498,6 +525,6 @@ onUnmounted(() => {
 }
 
 .input-bar button:hover {
-  background: #0098ff;
+  filter: brightness(1.08);
 }
 </style>
